@@ -46,6 +46,7 @@ import { EventToastContainer } from '../common/EventToastContainer';
 import { ContextBar } from '../common/ContextBar';
 import { SignalInjectorModal } from '../risk/SignalInjectorModal';
 import { IdentityGateway } from '../auth/IdentityGateway';
+import { Menu, X } from 'lucide-react';
 import { Global3DParticleCanvas } from '../../visual/environment/Global3DParticleCanvas';
 import { seedWorld, resetWorld } from '../../api/worldApi';
 import { resetRisk, injectSignal } from '../../api/riskApi';
@@ -323,6 +324,16 @@ export const ResilienceIntelligenceLayout: React.FC = () => {
 
   const [notificationCount] = useState(3);
   const [isSidebarExpanded] = useState(true);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  // Close the mobile drawer on navigation and on Escape
+  React.useEffect(() => { setMobileNavOpen(false); }, [location.pathname]);
+  React.useEffect(() => {
+    if (!mobileNavOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMobileNavOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mobileNavOpen]);
 
   // Establish global WebSocket connection
   React.useEffect(() => {
@@ -387,7 +398,13 @@ export const ResilienceIntelligenceLayout: React.FC = () => {
       <EventToastContainer />
 
       {/* ── SIDEBAR ── */}
-      <nav className="ri-sidebar">
+      {mobileNavOpen && (
+        <div className="ri-nav-backdrop" onClick={() => setMobileNavOpen(false)} aria-hidden="true" />
+      )}
+      <nav
+        className={`ri-sidebar${mobileNavOpen ? ' ri-sidebar--open' : ''}`}
+        aria-label="Primary navigation"
+      >
         {/* Product Mark */}
         <div style={{
           padding: '16px 16px 12px',
@@ -543,8 +560,17 @@ export const ResilienceIntelligenceLayout: React.FC = () => {
       {/* ── TOP BAR ── */}
       <header className="ri-topbar">
         {/* Left: Breadcrumb / Page Title */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+          <button
+            type="button"
+            className="ri-menu-btn"
+            aria-label={mobileNavOpen ? 'Close navigation' : 'Open navigation'}
+            aria-expanded={mobileNavOpen}
+            onClick={() => setMobileNavOpen(o => !o)}
+          >
+            {mobileNavOpen ? <X size={16} /> : <Menu size={16} />}
+          </button>
+          <div style={{ minWidth: 0 }}>
             <div style={{
               fontSize: '13px',
               fontWeight: 700,
@@ -740,7 +766,7 @@ export const ResilienceIntelligenceLayout: React.FC = () => {
       <ContextBar />
 
       {/* ── MAIN CONTENT ── */}
-      <main className="ri-main-content">
+      <main className="ri-main-content" id="main-content">
         <Outlet />
 
         {/* Signal Injector Modal */}

@@ -12,6 +12,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
+import { HindsightLoop } from '../hindsight/HindsightLoop';
 import { fetchWorldSummary } from '../../api/worldApi';
 import { fetchRiskMap } from '../../api/riskApi';
 import { useRealtimeStore } from '../../store/realtimeStore';
@@ -334,6 +335,11 @@ export const ResilienceDashboard: React.FC = () => {
             </div>
           </div>
         </div>
+      </motion.div>
+
+      {/* ── HINDSIGHT LOOP ── */}
+      <motion.div {...fadeIn} style={{ marginBottom: '20px' }}>
+        <HindsightLoop />
       </motion.div>
 
       {/* ── TOP METRICS ROW ── */}
